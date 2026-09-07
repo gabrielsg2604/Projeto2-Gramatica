@@ -159,6 +159,7 @@ class Grammar:
         self.build_follow()
         self.build_start()
 
+    # Função para eliminar recursão direta a esquerda
     def eliminate_direct_left_recursion(self, nonterminal: str) -> bool:
         productions = self.productions_for(nonterminal)
         rhs_recursive = []
@@ -170,16 +171,17 @@ class Grammar:
             else:
                 rhs_base.append(production.rhs)
 
-        if not rhs_recursive:
-            return False
+        if not rhs_recursive: # Nao há recursao direta neste nao-terminal
+            return False  
         
+        # Calcula e registra o nome do auxiliar na gramática
         a_linha = self._fresh_nonterminal(nonterminal)
         self._insert_nonterminal_after(nonterminal, a_linha)
         
         a_productions = [beta + (a_linha,) for beta in rhs_base]
 
         a_linha_productions = [alpha + (a_linha,) for alpha in rhs_recursive]
-        a_linha_productions.append(())  # epsilon
+        a_linha_productions.append(())
 
         self._replace_productions(nonterminal, a_productions)
         self._replace_productions(a_linha, a_linha_productions)
