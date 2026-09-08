@@ -163,10 +163,25 @@ class Grammar:
             return result
         else:
             return result             
-            
+      
+    # Função para identificar o FIRST dos não-terminais        
     def build_first(self) -> None:
-        """Preencha self.first por iteração até um ponto fixo."""
-        raise NotImplementedError("implemente FIRST")
+        self.first = {nonterminal: set() for nonterminal in self.nonterminals} # Zera First.
+        
+        first_change = True
+        
+        while first_change == True:
+            first_change = False
+            
+            for nonterminal in self.nonterminals:
+                for production in self.productions_for(nonterminal):
+                    rhs_first = self.first_of_sequence(production.rhs)
+
+                    first_before = len(self.first[nonterminal])
+                    self.first[nonterminal].update(rhs_first)
+
+                    if len(self.first[nonterminal]) != first_before: # Se houve alguma mudança, passa para True, continuando o laço
+                        first_change = True
 
     def build_follow(self) -> None:
         """Preencha self.follow; FIRST deve ter sido calculado antes."""
