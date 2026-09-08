@@ -138,10 +138,32 @@ class Grammar:
             candidate += "'"
         return candidate
 
+    # Função para determinar o primeiro da sequência
     def first_of_sequence(self, symbols: tuple[str, ...]) -> set[str]:
-        """Calcule FIRST para uma sequência de zero ou mais símbolos."""
-        raise NotImplementedError("implemente FIRST de uma sequência")
-
+        if not symbols:
+            return {EPSILON}
+        
+        result = set()
+        all_null = True # Preve que todos os símbolos serão anuláveis
+        
+        for symbol in symbols:
+            if symbol in self.nonterminals:
+                first_symbol = self.first[symbol]
+            else:
+                first_symbol = {symbol}
+                
+            result.update(first_symbol - {EPSILON})
+        
+            if EPSILON not in first_symbol:
+                all_null = False # Caso EPSILON não esteja em first_symbol, esse símbolo não é anulavel.
+                break
+        
+        if all_null == True:
+            result.add(EPSILON)
+            return result
+        else:
+            return result             
+            
     def build_first(self) -> None:
         """Preencha self.first por iteração até um ponto fixo."""
         raise NotImplementedError("implemente FIRST")
