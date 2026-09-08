@@ -184,9 +184,35 @@ class Grammar:
                         first_change = True
 
     def build_follow(self) -> None:
-        """Preencha self.follow; FIRST deve ter sido calculado antes."""
-        raise NotImplementedError("implemente FOLLOW")
+        self.follow = {nonterminal: set() for nonterminal in self.nonterminals} # Zera Follow
+        self.follow[self.start_symbol].add(EOF) # FOLLOW do simbolo inicial sempre inclui EOF
+        
+        follow_change = True
+        
+        while follow_change == True:
+            follow_change = False
+            
+            for production in self.productions:
+                position_next = set(self.follow[production.lhs])
 
+                for symbol in reversed(production.rhs):
+                    if symbol in self.nonterminals:
+                        first_symbol = self.first[symbol]
+
+                        follow_before = len(self.follow[symbol])
+                        self.follow[symbol].update(position_next)
+                        if len(self.follow[symbol]) != follow_before:
+                            follow_change = True
+                    else:
+                        first_symbol = {symbol}  # FIRST dele é ele mesmo
+
+                    if EPSILON in first_symbol:
+                        old_position_next = position_next
+                        position_next = (first_symbol - {EPSILON})
+                        position_next.update(old_position_next)
+                    else:
+                        position_next = first_symbol - {EPSILON}
+          
     def build_start(self) -> None:
         """Associe a cada produção seu conjunto START."""
         raise NotImplementedError("implemente START")
