@@ -214,8 +214,16 @@ class Grammar:
                         position_next = first_symbol - {EPSILON}
           
     def build_start(self) -> None:
-        """Associe a cada produção seu conjunto START."""
-        raise NotImplementedError("implemente START")
+        self.start = {}
+
+        for production in self.productions:
+            first_beta = self.first_of_sequence(production.rhs)
+
+            if EPSILON not in first_beta:
+                self.start[production] = first_beta
+            else:
+                self.start[production] = first_beta - {EPSILON}
+                self.start[production].update(self.follow[production.lhs])
 
     def build_sets(self) -> None:
         self.build_first()
